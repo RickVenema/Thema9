@@ -2,7 +2,9 @@
 title: "**Research Log**"
 author: "Rick Venema"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: 
+  pdf_document:
+    fig_caption: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -28,8 +30,9 @@ rawDataTraining <- read.csv("ForestTypes/training.csv")
 ```
 The dimensions of rawDataTesting is equal to `r pander(dim(rawDataTesting))`. The first value represents the amount of rows and the second value represents the number of columns. The rows represent the instances, while the columns represent the attributes. The dimensions of rawDataTraining is equal to `r pander(dim(rawDataTraining))`. 
   
-The data has a class attribute, this class attribute can have different values which are presented in table 1
-```{r echo=F}
+The data has a class attribute, this class attribute can have different values which are presented in table \ref{ClassAttributes}
+
+```{r ClassAttributes, echo=F, fig.cap="Class Attributes"}
 Sugi <-  c("s", "'Sugi' forest")
 Hinoki <-  c("h", "'Hinoki' forest")
 Mixed <- c("d", "'Mixed deciduous' forest")
@@ -38,15 +41,17 @@ Other <- c("o", "'Other' non-forest land")
 colnamesClass <- c("Abbrevation", "Full name")
 ClassAttributes <- as.data.frame(rbind(Sugi, Hinoki, Mixed, Other), row.names = 1)
 colnames(ClassAttributes) <- colnamesClass
-pander(ClassAttributes)
+set.caption("\\label{ClassAttributes}Class Attributes")
+pander(pandoc.table(ClassAttributes))
 ```
 
 
 
 The next 9 columns represent ???, a summary is given
 ```{r}
-bColumns <- rawDataTesting[2:10]
-pander(summary(bColumns))
+bColumns <- log2(rawDataTesting[2:10])
+colors = c(rep("green",3),rep("red",3),rep("violet",4))
+boxplot(bColumns, col=colors)
 ```
 
 
