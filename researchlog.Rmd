@@ -1,0 +1,65 @@
+---
+title: "**Research Log**"
+author: "Rick Venema"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("pander")
+```
+
+
+# General introduction
+In this research log, research is described that was carried out at the Hanze University of Applied sciences. This research is an attempt to create a classifier based on a forest data set. This dataset was used by Johnson et al. (2012) \cite{Johnson12}, their goal was to map different types of forests by using spectral data. The data set is available via the link https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping \cite{Dataset}.
+
+# Dataset
+
+## Dataset description
+This description is the description included with the site at which the data can be found, it gives a clear description on what kind of data we are dealing with.
+  
+`This data set contains training and testing data from a remote sensing study which mapped different forest types based on their spectral characteristics at visible-to-near infrared wavelengths, using ASTER satellite imagery. The output (forest type map) can be used to identify and/or quantify the ecosystem services (e.g. carbon storage, erosion protection) provided by the forest.`
+  
+## Layout of the data
+```{r}
+rawDataTesting <- read.csv("ForestTypes/testing.csv")
+rawDataTraining <- read.csv("ForestTypes/training.csv")
+```
+The dimensions of rawDataTesting is equal to `r pander(dim(rawDataTesting))`. The first value represents the amount of rows and the second value represents the number of columns. The rows represent the instances, while the columns represent the attributes. The dimensions of rawDataTraining is equal to `r pander(dim(rawDataTraining))`. 
+  
+The data has a class attribute, this class attribute can have different values which are presented in table 1
+```{r echo=F}
+Sugi <-  c("s", "'Sugi' forest")
+Hinoki <-  c("h", "'Hinoki' forest")
+Mixed <- c("d", "'Mixed deciduous' forest")
+Other <- c("o", "'Other' non-forest land")
+
+colnamesClass <- c("Abbrevation", "Full name")
+ClassAttributes <- as.data.frame(rbind(Sugi, Hinoki, Mixed, Other), row.names = 1)
+colnames(ClassAttributes) <- colnamesClass
+pander(ClassAttributes)
+```
+
+
+
+The next 9 columns represent ???, a summary is given
+```{r}
+bColumns <- rawDataTesting[2:10]
+pander(summary(bColumns))
+```
+
+
+# Research question
+
+possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
+
+\begin{thebibliography}{9}
+
+\bibitem{Johnson12}
+Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted variables for image classification. Remote Sensing Letters}, 3 (6), 491-499.
+
+\bibitem{Dataset}
+\textit{Forest type mapping Data Set} Retrieved September 11, 2018, from https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping
+
+\end{thebibliography}
