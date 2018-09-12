@@ -30,6 +30,7 @@ rawDataTraining <- read.csv("ForestTypes/training.csv")
 ```
 The dimensions of rawDataTesting is equal to `r pander(dim(rawDataTesting))`. The first value represents the amount of rows and the second value represents the number of columns. The rows represent the instances, while the columns represent the attributes. The dimensions of rawDataTraining is equal to `r pander(dim(rawDataTraining))`. 
   
+### The class attribute
 The data has a class attribute, this class attribute can have different values which are presented in table \ref{ClassAttributes}
 
 ```{r ClassAttributes, echo=F, fig.cap="Class Attributes"}
@@ -46,12 +47,21 @@ pander(pandoc.table(ClassAttributes))
 ```
 
 
+### The b columns
+In figure \ref{bColumnsUnsorted} the log2 transformed data of the b columns. The boxplot give a difference in the different years, this is because the different columns can be divided into 
+3 different years. The first 3 boxplots represent the data from 26 September 2010, the next three boxplots represent the data from 19 March 2011, and the last three boxplots represent the data from 8 May 2011. The different colors
+of the boxplots represent the different spectral wavelengths. The green color represent their corresponding wavelength green(0.52-0.60 µm), red (0.63-0.69 µm) and near-infrared (NIR) (0.76-0.86 µm). NIR is represented as violet in the boxplots.
 
-The next 9 columns represent ???, a summary is given
-```{r}
+
+```{r bColumnsUnsorted, echo=F, fig.cap="\\label{bColumnsUnsorted} The log2 transformed values of the b columns."}
 bColumns <- log2(rawDataTesting[2:10])
-colors = c(rep("green",3),rep("red",3),rep("violet",4))
-boxplot(bColumns, col=colors)
+boxplot(bColumns, col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
+```
+
+### The b columns orderd by class
+```{r bColumnsSorted}
+
+
 ```
 
 
