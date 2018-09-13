@@ -59,7 +59,7 @@ boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b c
 ```
 
 ### The b columns orderd by class
-To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates.
+To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates. THe data needs to be divided into the 3 groups. Each data has 3 boxplots, which each corresponding to the different spectral bands that are used in the research. These bands differ quite a bit, just like the boxplots in figure \ref{bColumnsUnsorted}. This can be due to the different seasons at which the images were taken. Different seasons have different values for the different spectral bands.
 ```{r bColumnsSorted, echo=F, fig.height=6, fig.cap="\\label{bColumnsSorted}B columns divided by class attribute", fig.pos="h!", out.extra = ''}
 bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
 bSugiRows <- bColumns[rawDataTesting$class=='s ',]
