@@ -17,6 +17,19 @@ library("pander")
 In this research log, research is described that was carried out at the Hanze University of Applied sciences. This research is an attempt to create a classifier based on a forest data set. This dataset was used by Johnson et al. (2012) \cite{Johnson12}, their goal was to map different types of forests by using spectral data. The data set is available via the link https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping \cite{Dataset}.
 
 ## About the research
+HIER MOET WAT IN ONDERZOEK GEDAAN IS
+
+# Research question
+possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
+
+Is het mogelijk om deze techniek toe te passen in de praktijk op agrarisch niveau en kan hier mee een nauwkeurige bepaling gedaan worden. 
+
+
+Het doel van dit project is om een machine learning model te maken dat kan bepalen wat voor soort bomen er in een bos staan. Verder is het doel om te kijken of het model statistisch gezien sterk genoeg is om in andere toepassingen dienst te doen, bijvoorbeeld in de landbouw, dit omdat deze techniek nog in de kinderschoenen staat in de landbouw. Een model dat kan bepalen om wat voor soort het gaat, kan als opstapje dienen om een universeel model te maken dat alles kan herkennen in een  afbeelding.
+
+Can a ML algorithm be accurate for recognizing different tree types in a forest, and can it have a practical use in other fields.
+
+Can a ML alg. give accurate results in recognizing different tree types in a forest.
 
 
 # Dataset
@@ -88,11 +101,8 @@ The `pred_minus_obs` columns represent the Predicted spectral values minus actua
 ```
 
 
-# Research question
 
-possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
 
-Can
 
 \begin{thebibliography}{9}
 
