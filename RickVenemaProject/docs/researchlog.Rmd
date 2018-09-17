@@ -49,7 +49,7 @@ The dimensions of rawDataTesting is equal to `r pander(dim(rawDataTesting))`. Th
 ### The class attribute
 The data has a class attribute, this class attribute can have different values which are presented in table \ref{ClassAttributes}
 
-```{r ClassAttributes, echo=F, fig.cap="Class Attributes"}
+```{r ClassAttributes, echo=F}
 Sugi <-  c("s", "'Sugi' forest")
 Hinoki <-  c("h", "'Hinoki' forest")
 Mixed <- c("d", "'Mixed deciduous' forest")
@@ -69,14 +69,80 @@ In figure \ref{bColumnsUnsorted} the log2 transformed data of the b columns. The
 of the boxplots represent the different spectral wavelengths. The green color represent their corresponding wavelength green(0.52-0.60 µm), red (0.63-0.69 µm) and near-infrared (NIR) (0.76-0.86 µm). NIR is represented as violet in the boxplots.
 
 
-```{r bColumnsUnsorted, echo=F, fig.cap="\\label{bColumnsUnsorted} The log2 transformed values of the b columns."}
+```{r bColumnsUnsortedTXT, echo=F}
 bColumns <- rawDataTesting[2:10]
-boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
+# boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
 ```
 
 ### The b columns orderd by class
 To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates. THe data needs to be divided into the 3 groups. Each data has 3 boxplots, which each corresponding to the different spectral bands that are used in the research. These bands differ quite a bit, just like the boxplots in figure \ref{bColumnsUnsorted}. This can be due to the different seasons at which the images were taken. Different seasons have different values for the different spectral bands. The spectral bands are collected by ASTRAL
-```{r bColumnsSorted, echo=F, fig.height=6, fig.cap="\\label{bColumnsSorted}B columns divided by class attribute", fig.pos="h!", out.extra = ''}
+```{r bColumnsSortedTXT, echo=F, fig.height=6, out.extra = ''}
+bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
+bSugiRows <- bColumns[rawDataTesting$class=='s ',]
+bMixedRows <- bColumns[rawDataTesting$class=='d ',]
+bOtherRows <- bColumns[rawDataTesting$class=='o ',]
+
+# par(mfrow=c(2,2))
+# boxplot(bHinokiRows, main="The b columns with class 'Hinoki' (a)"
+#         , xlab="The different b columns", ylab="Log2 transformed values")
+# boxplot(bSugiRows, main="The b columns with class 'Sugi' (b)"
+#         , xlab="The different b columns", ylab="Log2 transformed values")
+# boxplot(bMixedRows, main="The b columns with class 'Mixed' (c)"
+#         , xlab="The different b columns", ylab="Log2 transformed values")
+# boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
+#         , xlab="The different b columns", ylab="Log2 transformed values")
+```
+
+### pred_minus_obs columns
+The `pred_minus_obs` columns represent the Predicted spectral values minus actual spectral values for the `s` or `h` class. These values are calculated based on spatial interpolation. 
+
+```{r}
+
+
+```
+
+# EDA
+
+## hierarchical clustering
+```{r hierarchicalclustering}
+dHinoki <- dist(bHinokiRows)
+outHinoki <- hclust(dHinoki)
+plot(outHinoki)
+
+dMixed <- dist(bMixedRows)
+outMixed <- hclust(dMixed)
+clusterCut <- cutree(outMixed, 30)
+plot(clusterCut)
+
+bColumnsDist <- dist(bColumns)
+outbColumns <- hclust(bColumnsDist)
+clusterCut <- cutree(outbColumns, 30)
+
+```
+
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Johnson12}
+Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted variables for image classification. Remote Sensing Letters}, 3 (6), 491-499.
+
+\bibitem{Dataset}
+\textit{Forest type mapping Data Set} Retrieved September 11, 2018, from https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping
+
+\end{thebibliography}
+
+\newpage
+# Attachments
+## Figure \ref{bColumnsUnsorted}
+```{r bColumnsUnsorted, echo=F, fig.cap="\\label{bColumnsUnsorted} The log2 transformed values of the b columns.", fig.pos="!h", out.extra= ''}
+bColumns <- rawDataTesting[2:10]
+boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
+```
+
+\newpage
+## Figure \ref{bColumnsSorted}
+```{r bColumnsSorted, echo=F, fig.height=6, fig.cap="\\label{bColumnsSorted}B columns divided by class attribute", out.extra = '', fig.pos='!h'}
 bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
 bSugiRows <- bColumns[rawDataTesting$class=='s ',]
 bMixedRows <- bColumns[rawDataTesting$class=='d ',]
@@ -92,29 +158,3 @@ boxplot(bMixedRows, main="The b columns with class 'Mixed' (c)"
 boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
         , xlab="The different b columns", ylab="Log2 transformed values")
 ```
-
-### pred_minus_obs columns
-The `pred_minus_obs` columns represent the Predicted spectral values minus actual spectral values for the `s` or `h` class. These values are calculated based on spatial interpolation. 
-
-```{r}
-
-```
-
-
-
-
-
-\begin{thebibliography}{9}
-
-\bibitem{Johnson12}
-Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted variables for image classification. Remote Sensing Letters}, 3 (6), 491-499.
-
-\bibitem{Dataset}
-\textit{Forest type mapping Data Set} Retrieved September 11, 2018, from https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping
-
-\end{thebibliography}
-
-
-
-
-
