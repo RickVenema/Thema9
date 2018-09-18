@@ -16,6 +16,7 @@ library(dendextend)
 ```
 
 
+
 # General introduction
 In this research log, research is described that was carried out at the Hanze University of Applied sciences. This research is an attempt to create a classifier based on a forest data set. This dataset was used by Johnson et al. (2012) \cite{Johnson12}, their goal was to map different types of forests by using spectral data. The data set is available via the link https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping \cite{Dataset}.
 
@@ -43,7 +44,7 @@ This description is the description included with the site at which the data can
 `This data set contains training and testing data from a remote sensing study which mapped different forest types based on their spectral characteristics at visible-to-near infrared wavelengths, using ASTER satellite imagery. The output (forest type map) can be used to identify and/or quantify the ecosystem services (e.g. carbon storage, erosion protection) provided by the forest.`
   
 ## Layout of the data
-```{r}
+```{r loadingData, echo=F}
 rawDataTesting <- read.csv("../data/ForestTypes/testing.csv")
 rawDataTraining <- read.csv("../data/ForestTypes/training.csv")
 ```
@@ -51,6 +52,7 @@ The dimensions of rawDataTesting is equal to `r pander(dim(rawDataTesting))`. Th
 
 ### The class attribute
 The data has a class attribute, this class attribute can have different values which are presented in table \ref{ClassAttributes}
+
 
 ```{r ClassAttributes, echo=F}
 Sugi <-  c("s", "'Sugi' forest")
@@ -65,35 +67,36 @@ set.caption("\\label{ClassAttributes}Class Attributes")
 pander(pandoc.table(ClassAttributes))
 ```
 
-
 ### The b columns
 In figure \ref{bColumnsUnsorted} the log2 transformed data of the b columns. The boxplot give a difference in the different years, this is because the different columns can be divided into 
 3 different years. The first 3 boxplots represent the data from 26 September 2010, the next three boxplots represent the data from 19 March 2011, and the last three boxplots represent the data from 8 May 2011. The different colors
 of the boxplots represent the different spectral wavelengths. The green color represent their corresponding wavelength green(0.52-0.60 µm), red (0.63-0.69 µm) and near-infrared (NIR) (0.76-0.86 µm). NIR is represented as violet in the boxplots.
 
 
-```{r bColumnsUnsortedTXT, echo=F}
+```{r bColumnsUnsortedTXT, echo=F, eval=F}
 bColumns <- rawDataTesting[2:10]
-# boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
+boxplot(log2(bColumns), col=c("green", "red", "violet"), 
+        xlab="The different b columns", ylab="Log2 transformed values", 
+        main="Boxplot showing the log2 transformed data of the b columns")
 ```
 
 ### The b columns orderd by class
 To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates. THe data needs to be divided into the 3 groups. Each data has 3 boxplots, which each corresponding to the different spectral bands that are used in the research. These bands differ quite a bit, just like the boxplots in figure \ref{bColumnsUnsorted}. This can be due to the different seasons at which the images were taken. Different seasons have different values for the different spectral bands. The spectral bands are collected by ASTRAL
-```{r bColumnsSortedTXT, echo=F, fig.height=6, out.extra = ''}
+```{r bColumnsSortedTXT, echo=F, fig.height=6, out.extra = '', eval=F}
 bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
 bSugiRows <- bColumns[rawDataTesting$class=='s ',]
 bMixedRows <- bColumns[rawDataTesting$class=='d ',]
 bOtherRows <- bColumns[rawDataTesting$class=='o ',]
 
-# par(mfrow=c(2,2))
-# boxplot(bHinokiRows, main="The b columns with class 'Hinoki' (a)"
-#         , xlab="The different b columns", ylab="Log2 transformed values")
-# boxplot(bSugiRows, main="The b columns with class 'Sugi' (b)"
-#         , xlab="The different b columns", ylab="Log2 transformed values")
-# boxplot(bMixedRows, main="The b columns with class 'Mixed' (c)"
-#         , xlab="The different b columns", ylab="Log2 transformed values")
-# boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
-#         , xlab="The different b columns", ylab="Log2 transformed values")
+par(mfrow=c(2,2))
+boxplot(bHinokiRows, main="The b columns with class 'Hinoki' (a)"
+        , xlab="The different b columns", ylab="Log2 transformed values")
+boxplot(bSugiRows, main="The b columns with class 'Sugi' (b)"
+        , xlab="The different b columns", ylab="Log2 transformed values")
+boxplot(bMixedRows, main="The b columns with class 'Mixed' (c)"
+        , xlab="The different b columns", ylab="Log2 transformed values")
+boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
+        , xlab="The different b columns", ylab="Log2 transformed values")
 ```
 
 ### pred_minus_obs columns
@@ -109,8 +112,6 @@ The `pred_minus_obs` columns represent the Predicted spectral values minus actua
 ## hierarchical clustering
 A hierarchical clustering was performed to get a view of the data clustered into the different groups. Each group is clustered into different groups. As figure \ref{histColor}
 ```{r histColorTXT, echo=F, eval=F}
-## mtcars example
-
 # Create the dend:
 dend <- as.dendrogram(hclust(dist(rawDataTraining)))
 
@@ -125,14 +126,15 @@ Forest_type[is_x] <- "Mixed"
 
 Forest_type <- factor(Forest_type)
 nForestTypes <- length(unique(Forest_type))
-cols_4 <- colorspace::rainbow_hcl(nForestTypes, c = 70, l = 50)
+cols_4 <- colorspace::rainbow_hcl(nFordestTypes, c = 70, l = 50)
 colForestType <- cols_4[Forest_type]
 k234 <- cutree(dend, k = 2:4)
 labels_colors(dend) <- colForestType[order.dendrogram(dend)]
 
 par(mar = c(4,1,1,12))
 plot(dend, horiz = TRUE)
-colored_bars(cbind(k234[,3:1], colForestType), dend, rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
+colored_bars(cbind(k234[,3:1], colForestType), dend, 
+             rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
 legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
 
@@ -151,8 +153,7 @@ Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted 
 # Attachments
 ## Figure \ref{bColumnsUnsorted}
 ```{r bColumnsUnsorted, echo=F, fig.cap="\\label{bColumnsUnsorted} The log2 transformed values of the b columns.", fig.pos="!h", out.extra= ''}
-bColumns <- rawDataTesting[2:10]
-boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
+source("../scripts/BoxplotsbColumns.R")
 ```
 
 \newpage
@@ -176,7 +177,7 @@ boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
 
 \newpage
 ## Figure \ref{histColor}
-```{r histColor, fig.cap="\\label{histColor}Hierarchical clustered data of the training Data", echo=F, warning=F, fig.height=7, fig.pos="!h", out.extra=''}
+```{r histColor, fig.cap="\\label{histColor}Hierarchical clustered data of the training Data", echo=F, warning=F, fig.height=7.5, fig.pos="!h", out.extra=''}
 ## mtcars example
 
 # Create the dend:

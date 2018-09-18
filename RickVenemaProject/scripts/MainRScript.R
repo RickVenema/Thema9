@@ -1,3 +1,6 @@
+library(pander)
+setwd("D:/School/thema 9/Thema9/RickVenemaProject/scripts")
+
 rawDataTesting <- read.csv("../data/ForestTypes/testing.csv")
 rawDataTraining <- read.csv("../data/ForestTypes/training.csv")
 
@@ -9,8 +12,8 @@ Other <- c("o", "'Other' non-forest land")
 colnamesClass <- c("Abbrevation", "Full name")
 ClassAttributes <- as.data.frame(rbind(Sugi, Hinoki, Mixed, Other), row.names = 1)
 colnames(ClassAttributes) <- colnamesClass
-set.caption("\\label{ClassAttributes}Class Attributes")
+# set.caption("\\label{ClassAttributes}Class Attributes")
 pander(pandoc.table(ClassAttributes))
 
-source('Boxplots.R')
+source("BoxplotsbColumns.R")
 
