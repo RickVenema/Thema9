@@ -10,6 +10,9 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library("pander")
+library(ggplot2)
+library(gplots)
+library(dendextend)
 ```
 
 
@@ -104,22 +107,34 @@ The `pred_minus_obs` columns represent the Predicted spectral values minus actua
 # EDA
 
 ## hierarchical clustering
-```{r hierarchicalclustering}
-dHinoki <- dist(bHinokiRows)
-outHinoki <- hclust(dHinoki)
-plot(outHinoki)
 
-dMixed <- dist(bMixedRows)
-outMixed <- hclust(dMixed)
-clusterCut <- cutree(outMixed, 30)
-plot(clusterCut)
+```{r histColor}
+## mtcars example
 
-bColumnsDist <- dist(bColumns)
-outbColumns <- hclust(bColumnsDist)
-clusterCut <- cutree(outbColumns, 30)
+# Create the dend:
+dend <- as.dendrogram(hclust(dist(rawDataTraining)))
 
+# Create a vector giving a color for each car to which company it belongs to
+Forest_type <- rep("Other", length(rownames(rawDataTraining)))
+is_x <- grepl("h ", rawDataTraining$class)
+Forest_type[is_x] <- "Hinoki"
+is_x <- grepl("s ", rawDataTraining$class)
+Forest_type[is_x] <- "Sugi"
+is_x <- grepl("d ", rawDataTraining$class)
+Forest_type[is_x] <- "Mixed"
+
+Forest_type <- factor(Forest_type)
+nForestTypes <- length(unique(Forest_type))
+cols_4 <- colorspace::rainbow_hcl(nForestTypes, c = 70, l = 50)
+colForestType <- cols_4[Forest_type]
+k234 <- cutree(dend, k = 2:4)
+labels_colors(dend) <- colForestType[order.dendrogram(dend)]
+
+par(mar = c(4,1,1,12))
+plot(dend, horiz = TRUE)
+colored_bars(cbind(k234[,3:1], colForestType), dend, rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
+legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
-
 
 
 \begin{thebibliography}{9}
