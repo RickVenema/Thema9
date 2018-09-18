@@ -107,8 +107,8 @@ The `pred_minus_obs` columns represent the Predicted spectral values minus actua
 # EDA
 
 ## hierarchical clustering
-
-```{r histColor}
+A hierarchical clustering was performed to get a view of the data clustered into the different groups. Each group is clustered into different groups. As figure \ref{histColor}
+```{r histColorTXT, echo=F, eval=F}
 ## mtcars example
 
 # Create the dend:
@@ -173,3 +173,34 @@ boxplot(bMixedRows, main="The b columns with class 'Mixed' (c)"
 boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
         , xlab="The different b columns", ylab="Log2 transformed values")
 ```
+
+\newpage
+## Figure \ref{histColor}
+```{r histColor, fig.cap="\\label{histColor}Hierarchical clustered data of the training Data", echo=F, warning=F, fig.height=7, fig.pos="!h", out.extra=''}
+## mtcars example
+
+# Create the dend:
+dend <- as.dendrogram(hclust(dist(rawDataTraining)))
+
+# Create a vector giving a color for each car to which company it belongs to
+Forest_type <- rep("Other", length(rownames(rawDataTraining)))
+is_x <- grepl("h ", rawDataTraining$class)
+Forest_type[is_x] <- "Hinoki"
+is_x <- grepl("s ", rawDataTraining$class)
+Forest_type[is_x] <- "Sugi"
+is_x <- grepl("d ", rawDataTraining$class)
+Forest_type[is_x] <- "Mixed"
+
+Forest_type <- factor(Forest_type)
+nForestTypes <- length(unique(Forest_type))
+cols_4 <- colorspace::rainbow_hcl(nForestTypes, c = 70, l = 50)
+colForestType <- cols_4[Forest_type]
+k234 <- cutree(dend, k = 2:4)
+labels_colors(dend) <- colForestType[order.dendrogram(dend)]
+
+par(mar = c(4,1,1,12))
+plot(dend, horiz = TRUE)
+colored_bars(cbind(k234[,3:1], colForestType), dend, rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
+legend("topleft", legend = levels(Forest_type), fill = cols_4)
+```
+

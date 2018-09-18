@@ -1,0 +1,2 @@
+bColumns <- rawDataTesting[2:10]
+boxplot(log2(bColumns), col=c("green", "red", "violet"), xlab="The different b columns", ylab="Log2 transformed values", main="Boxplot showing the log2 transformed data of the b columns")
