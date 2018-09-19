@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output: 
   pdf_document:
     fig_caption: yes
+    toc: True
 ---
 
 ```{r setup, include=FALSE}
@@ -13,6 +14,7 @@ library("pander")
 library(ggplot2)
 library(gplots)
 library(dendextend)
+
 ```
 
 
@@ -21,7 +23,7 @@ library(dendextend)
 In this research log, research is described that was carried out at the Hanze University of Applied sciences. This research is an attempt to create a classifier based on a forest data set. This dataset was used by Johnson et al. (2012) \cite{Johnson12}, their goal was to map different types of forests by using spectral data. The data set is available via the link https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping \cite{Dataset}.
 
 ## About the research
-HIER MOET WAT IN ONDERZOEK GEDAAN IS
+In the study by Johnson et al. (2012)\cite{Johnson12}, geographically weighted variables calculated for two tree species were used in addition to spectral information to classify the two different tree types in a mixed forest. Numeric spectral values were used as trainings samples for predicting spectral values at other locations using the inverse distance weighting (IDW) interpolation method. Next, the similarity between spectral values and their IDW predicted values was calculated for both tree species. This simularity is considered geographically weighted because nearer training samples have more of an impact on their calculations. This resulted in an increase in overall accuracy.
 
 # Research question
 possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
@@ -81,7 +83,7 @@ boxplot(log2(bColumns), col=c("green", "red", "violet"),
 ```
 
 ### The b columns orderd by class
-To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates. THe data needs to be divided into the 3 groups. Each data has 3 boxplots, which each corresponding to the different spectral bands that are used in the research. These bands differ quite a bit, just like the boxplots in figure \ref{bColumnsUnsorted}. This can be due to the different seasons at which the images were taken. Different seasons have different values for the different spectral bands. The spectral bands are collected by ASTRAL
+To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates. THe data needs to be divided into the 3 groups. Each data has 3 boxplots, which each corresponding to the different spectral bands that are used in the research. These bands differ quite a bit, just like the boxplots in figure \ref{bColumnsUnsorted}. This can be due to the different seasons at which the images were taken. Different seasons have different values for the different spectral bands. The spectral bands are collected by ASTRAL imagery.
 ```{r bColumnsSortedTXT, echo=F, fig.height=6, out.extra = '', eval=F}
 bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
 bSugiRows <- bColumns[rawDataTesting$class=='s ',]
@@ -100,7 +102,7 @@ boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
 ```
 
 ### pred_minus_obs columns
-The `pred_minus_obs` columns represent the Predicted spectral values minus actual spectral values for the `s` or `h` class. These values are calculated based on spatial interpolation. 
+The `pred_minus_obs` columns represent the Predicted spectral values minus actual spectral values for the `s` or `h` class. These values are calculated based on spatial interpolation. For this calculation the IDW method was used, this method considers the values of nearby samples to predict the value at a given location. 
 
 ```{r}
 
@@ -126,7 +128,7 @@ Forest_type[is_x] <- "Mixed"
 
 Forest_type <- factor(Forest_type)
 nForestTypes <- length(unique(Forest_type))
-cols_4 <- colorspace::rainbow_hcl(nFordestTypes, c = 70, l = 50)
+cols_4 <- colorspace::rainbow_hcl(nForestTypes, c = 70, l = 50)
 colForestType <- cols_4[Forest_type]
 k234 <- cutree(dend, k = 2:4)
 labels_colors(dend) <- colForestType[order.dendrogram(dend)]
@@ -137,6 +139,48 @@ colored_bars(cbind(k234[,3:1], colForestType), dend,
              rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
 legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
+
+## PCA
+```{r PCATXT, echo=F}
+PCA.data <- rawDataTraining[2:10]
+
+PCA.data <- data.frame(rowSums( PCA.data[,1:3 ]),
+                        rowSums( PCA.data[,4:6 ]),
+                        rowSums( PCA.data[,7:9])
+                        )
+
+colnames(PCA.data) <- c("26 September 2010", "19 March 2011", "8 May 2011")
+
+
+
+PCA.data.log <- log(PCA.data)
+
+PCA.bColumns <- prcomp(PCA.data.log,
+                       center=TRUE,
+                       scale. = TRUE)
+
+# plot(PCA.bColumns, type="l")
+
+pander(summary(PCA.data))
+
+predict(PCA.bColumns, 
+        newdata=tail(PCA.data.log, 2))
+
+
+
+theta <- seq(0,2*pi,length.out = 100)
+circle <- data.frame(x = cos(theta), y = sin(theta))
+p <- ggplot(circle,aes(x,y)) + geom_path()
+
+loadings <- data.frame(PCA.bColumns$rotation, 
+                       .names = row.names(PCA.bColumns$rotation))
+p + geom_text(data=loadings, 
+              mapping=aes(x = PC1, y = PC2, label = .names, colour = .names)) +
+  coord_fixed(ratio=1) +
+labs(x = "PC1", y = "PC2")
+```
+
+
 
 
 \begin{thebibliography}{9}
@@ -178,8 +222,6 @@ boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
 \newpage
 ## Figure \ref{histColor}
 ```{r histColor, fig.cap="\\label{histColor}Hierarchical clustered data of the training Data", echo=F, warning=F, fig.height=7.5, fig.pos="!h", out.extra=''}
-## mtcars example
-
 # Create the dend:
 dend <- as.dendrogram(hclust(dist(rawDataTraining)))
 
@@ -204,4 +246,33 @@ plot(dend, horiz = TRUE)
 colored_bars(cbind(k234[,3:1], colForestType), dend, rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
 legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
+
+\newpage
+## Figure \ref{PCA}
+```{r PCA, fig.cap="\\label{PCA}", out.extra='', echo=F, fig.pos="!h"}
+PCA.data <- rawDataTraining[2:10]
+
+PCA.data <- data.frame(rowSums( PCA.data[,1:3 ]),
+                        rowSums( PCA.data[,4:6 ]),
+                        rowSums( PCA.data[,7:9])
+                        )
+
+colnames(PCA.data) <- c("26 September 2010", "19 March 2011", "8 May 2011")
+
+
+
+PCA.data.log <- log(PCA.data)
+
+PCA.bColumns <- prcomp(PCA.data.log,
+                       center=TRUE,
+                       scale. = TRUE)
+
+plot(PCA.bColumns, type="l", main="variances associated with the PCs")
+```
+
+
+
+
+
+
 
