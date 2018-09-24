@@ -26,7 +26,7 @@ In this research log, research is described that was carried out at the Hanze Un
 In the study by Johnson et al. (2012)\cite{Johnson12}, geographically weighted variables calculated for two tree species were used in addition to spectral information to classify the two different tree types in a mixed forest. Numeric spectral values were used as trainings samples for predicting spectral values at other locations using the inverse distance weighting (IDW) interpolation method. Next, the similarity between spectral values and their IDW predicted values was calculated for both tree species. This simularity is considered geographically weighted because nearer training samples have more of an impact on their calculations. This resulted in an increase in overall accuracy.
 
 # Research question
-
+Based on the research chosen, a research question was created to further improve 
 
 possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
 
@@ -106,15 +106,40 @@ boxplot(bOtherRows, main="The b columns with class 'Other' (d)"
 ### pred_minus_obs columns
 The `pred_minus_obs` columns represent the Predicted spectral values minus actual spectral values for the `s` or `h` class. These values are calculated based on spatial interpolation. For this calculation the IDW method was used, this method considers the values of nearby samples to predict the value at a given location. 
 
-```{r}
-
-
-```
 
 # EDA
+## Evenly or unevenly classes
+The classes are unevenly represented. The dimensions are printed next, ordered by class type
+
+```{r evenuneven, echo=F}
+bColumns <- rawDataTraining[2:10]
+bHinokiRows <- bColumns[rawDataTraining$class=='h ',]
+bSugiRows <- bColumns[rawDataTraining$class=='s ',]
+bMixedRows <- bColumns[rawDataTraining$class=='d ',]
+bOtherRows <- bColumns[rawDataTraining$class=='o ',]
+
+pander("Hinoki amount: ") 
+pander(dim(bHinokiRows)[1])
+pander(", Sugi amount: ")
+pander(dim(bSugiRows)[1])
+pander(", Mixed amount: ")
+pander(dim(bMixedRows)[1])
+pander(", Other amount: ")
+pander(dim(bOtherRows)[1])
+```
+
+## Missing data
+To check if there is missing values the dataset needs to be searched for NA values. 
+  
+```{r NAcheck, echo=F}
+pander("Is any number NA? ")
+pander(any(is.na(rawDataTraining)))
+```
+
+This check has been done by using the `any()` function and the `is.na()` function.
 
 ## hierarchical clustering
-A hierarchical clustering was performed to get a view of the data clustered into the different groups. Each group is clustered into different groups. As figure \ref{histColor}
+A hierarchical clustering was performed to get a view of the data clustered into the different groups. Each group is clustered into different groups. As figure \ref{histColor} shows, the data is clustered mostly in the correct groups, however some of the data is not clustered right. This can have different reasons, especially when the Mixed class and Other class are not correctly clustered.
 ```{r histColorTXT, echo=F, eval=F}
 # Create the dend:
 dend <- as.dendrogram(hclust(dist(rawDataTraining)))
@@ -143,8 +168,8 @@ legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
 
 ## PCA
-A PCA ()
-```{r PCATXT, echo=F}
+A Principal Component Analysis (PCA) was performed on the data. PCA is a dimensionality reduction technique that is used in data analysis. Reducing the dimensionality of a dataset can be useful in different ways\cite{PCA}. First a summary of the data was made. The three different rows per date were summed to get one column per date. This reduced the spread of the PCA. 
+```{r PCATXT1, echo=F}
 PCA.data <- rawDataTraining[2:10]
 
 PCA.data <- data.frame(rowSums( PCA.data[,1:3 ]),
@@ -163,24 +188,30 @@ PCA.bColumns <- prcomp(PCA.data.log,
                        scale. = TRUE)
 
 # plot(PCA.bColumns, type="l")
-
+set.caption("\\label{sumPCA}Summary of the PCA data")
 pander(summary(PCA.data))
+```
 
-predict(PCA.bColumns, 
-        newdata=tail(PCA.data.log, 2))
+Next a Prediction was executed and the results are shown in \ref{predPCA}.
+
+```{r PCATXT2, echo=F}
+
+set.caption("\\label{predPCA}Prediction of the log2 data")
+pander(predict(PCA.bColumns, 
+        newdata=tail(PCA.data.log, 2)))
 
 
 
 theta <- seq(0,2*pi,length.out = 100)
 circle <- data.frame(x = cos(theta), y = sin(theta))
-p <- ggplot(circle,aes(x,y)) + geom_path()
-
-loadings <- data.frame(PCA.bColumns$rotation, 
-                       .names = row.names(PCA.bColumns$rotation))
-p + geom_text(data=loadings, 
-              mapping=aes(x = PC1, y = PC2, label = .names, colour = .names)) +
-  coord_fixed(ratio=1) +
-labs(x = "PC1", y = "PC2")
+# p <- ggplot(circle,aes(x,y)) + geom_path()
+# 
+# loadings <- data.frame(PCA.bColumns$rotation, 
+#                        .names = row.names(PCA.bColumns$rotation))
+# p + geom_text(data=loadings, 
+#               mapping=aes(x = PC1, y = PC2, label = .names, colour = .names)) +
+#   coord_fixed(ratio=1) +
+# labs(x = "PC1", y = "PC2")
 ```
 
 
@@ -192,6 +223,9 @@ Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted 
 
 \bibitem{Dataset}
 \textit{Forest type mapping Data Set} Retrieved September 11, 2018, from https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping
+
+\bibitem{PCA}
+\textit{ Introduction to Principal Component Analysis (PCA)} Viewed September 24 2018, from https://tgmstat.wordpress.com/2013/11/21/introduction-to-principal-component-analysis-pca/
 
 \end{thebibliography}
 
