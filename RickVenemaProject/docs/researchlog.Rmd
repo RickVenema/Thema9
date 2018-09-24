@@ -26,6 +26,8 @@ In this research log, research is described that was carried out at the Hanze Un
 In the study by Johnson et al. (2012)\cite{Johnson12}, geographically weighted variables calculated for two tree species were used in addition to spectral information to classify the two different tree types in a mixed forest. Numeric spectral values were used as trainings samples for predicting spectral values at other locations using the inverse distance weighting (IDW) interpolation method. Next, the similarity between spectral values and their IDW predicted values was calculated for both tree species. This simularity is considered geographically weighted because nearer training samples have more of an impact on their calculations. This resulted in an increase in overall accuracy.
 
 # Research question
+
+
 possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
 
 Is het mogelijk om deze techniek toe te passen in de praktijk op agrarisch niveau en kan hier mee een nauwkeurige bepaling gedaan worden. 
@@ -141,6 +143,7 @@ legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
 
 ## PCA
+A PCA ()
 ```{r PCATXT, echo=F}
 PCA.data <- rawDataTraining[2:10]
 
@@ -179,7 +182,6 @@ p + geom_text(data=loadings,
   coord_fixed(ratio=1) +
 labs(x = "PC1", y = "PC2")
 ```
-
 
 
 
@@ -248,8 +250,8 @@ legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
 
 \newpage
-## Figure \ref{PCA}
-```{r PCA, fig.cap="\\label{PCA}", out.extra='', echo=F, fig.pos="!h"}
+## Figure \ref{PCAa}
+```{r PCAa, fig.cap="\\label{PCAa}", out.extra='', echo=F, fig.pos="!h"}
 PCA.data <- rawDataTraining[2:10]
 
 PCA.data <- data.frame(rowSums( PCA.data[,1:3 ]),
@@ -270,7 +272,25 @@ PCA.bColumns <- prcomp(PCA.data.log,
 plot(PCA.bColumns, type="l", main="variances associated with the PCs")
 ```
 
+\newpage
+## Figure \ref{PCAb}
+```{r PCAb, echo=F, fig.cap="\\label{PCAb}", out.extra='', fig.pos="!h"}
+# predict(PCA.bColumns, 
+#         newdata=tail(PCA.data.log, 2))
 
+
+
+theta <- seq(0,2*pi,length.out = 100)
+circle <- data.frame(x = cos(theta), y = sin(theta))
+p <- ggplot(circle,aes(x,y)) + geom_path()
+
+loadings <- data.frame(PCA.bColumns$rotation, 
+                       .names = row.names(PCA.bColumns$rotation))
+p + geom_text(data=loadings, 
+              mapping=aes(x = PC1, y = PC2, label = .names, colour = .names)) +
+  coord_fixed(ratio=1) +
+labs(x = "PC1", y = "PC2")
+```
 
 
 
