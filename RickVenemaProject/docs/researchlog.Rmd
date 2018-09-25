@@ -6,6 +6,7 @@ output:
   pdf_document:
     fig_caption: yes
     toc: True
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
@@ -17,28 +18,46 @@ library(dendextend)
 
 ```
 
-
+\newpage
 
 # General introduction
 In this research log, research is described that was carried out at the Hanze University of Applied sciences. This research is an attempt to create a classifier based on a forest data set. This dataset was used by Johnson et al. (2012) \cite{Johnson12}, their goal was to map different types of forests by using spectral data. The data set is available via the link https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping \cite{Dataset}.
+
+## License
+```{}
+Research log of thema 9
+Copyright (C) 2018  Rick Venema
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+```
 
 ## About the research
 In the study by Johnson et al. (2012)\cite{Johnson12}, geographically weighted variables calculated for two tree species were used in addition to spectral information to classify the two different tree types in a mixed forest. Numeric spectral values were used as trainings samples for predicting spectral values at other locations using the inverse distance weighting (IDW) interpolation method. Next, the similarity between spectral values and their IDW predicted values was calculated for both tree species. This simularity is considered geographically weighted because nearer training samples have more of an impact on their calculations. This resulted in an increase in overall accuracy.
 
 # Research question
-Based on the research chosen, a research question was created to further improve 
+Based on the research chosen, a research question was created to further improve a model that can classify different forest types in a mixed forest. The question that was eventually created needed to include ML algorithms. The first question that was created was validated by classmates. 
+```{}
+Can a Machine learning algorithm give accurate results in recognizing different tree
+types in a forest.
+```
 
-possible to expand this to be used in different situations. Crop recognition for example, differences in one crop. 
+This question had different comments, that were taken into account in improving the research question.
 
-Is het mogelijk om deze techniek toe te passen in de praktijk op agrarisch niveau en kan hier mee een nauwkeurige bepaling gedaan worden. 
-
-
-Het doel van dit project is om een machine learning model te maken dat kan bepalen wat voor soort bomen er in een bos staan. Verder is het doel om te kijken of het model statistisch gezien sterk genoeg is om in andere toepassingen dienst te doen, bijvoorbeeld in de landbouw, dit omdat deze techniek nog in de kinderschoenen staat in de landbouw. Een model dat kan bepalen om wat voor soort het gaat, kan als opstapje dienen om een universeel model te maken dat alles kan herkennen in een  afbeelding.
-
-Can a ML algorithm be accurate for recognizing different tree types in a forest, and can it have a practical use in other fields.
-
-Can a ML alg. give accurate results in recognizing different tree types in a forest.
-
+```{}
+What difference can a machine learning algorithm produce when recognizing different 
+tree types in a forest, taking geographical weighted variables into account?
+```
 
 # Dataset
 
@@ -74,11 +93,11 @@ pander(pandoc.table(ClassAttributes))
 ### The b columns
 In figure \ref{bColumnsUnsorted} the log2 transformed data of the b columns. The boxplot give a difference in the different years, this is because the different columns can be divided into 
 3 different years. The first 3 boxplots represent the data from 26 September 2010, the next three boxplots represent the data from 19 March 2011, and the last three boxplots represent the data from 8 May 2011. The different colors
-of the boxplots represent the different spectral wavelengths. The green color represent their corresponding wavelength green(0.52-0.60 µm), red (0.63-0.69 µm) and near-infrared (NIR) (0.76-0.86 µm). NIR is represented as violet in the boxplots.
+of the boxplots represent the different spectral wavelengths. The green color represent their corresponding wavelength green(0.52-0.60 ?m), red (0.63-0.69 ?m) and near-infrared (NIR) (0.76-0.86 ?m). NIR is represented as violet in the boxplots.
 
 
 ```{r bColumnsUnsortedTXT, echo=F, eval=F}
-bColumns <- rawDataTesting[2:10]
+bColumns <- rawDataTraining[2:10]
 boxplot(log2(bColumns), col=c("green", "red", "violet"), 
         xlab="The different b columns", ylab="Log2 transformed values", 
         main="Boxplot showing the log2 transformed data of the b columns")
@@ -87,11 +106,12 @@ boxplot(log2(bColumns), col=c("green", "red", "violet"),
 ### The b columns orderd by class
 To get a better view of the differences between dates, the data was split into the 4 different class attributes. Each different kind of forest was put into a boxplot, which can be seen in figure \ref{bColumnsSorted}. As can be seen, the dates differ a lot. This can be due to the different seasons at which the pictures were taken. The boxplots created from the March 2011 data, is higher than the other dates. THe data needs to be divided into the 3 groups. Each data has 3 boxplots, which each corresponding to the different spectral bands that are used in the research. These bands differ quite a bit, just like the boxplots in figure \ref{bColumnsUnsorted}. This can be due to the different seasons at which the images were taken. Different seasons have different values for the different spectral bands. The spectral bands are collected by ASTRAL imagery.
 ```{r bColumnsSortedTXT, echo=F, fig.height=6, out.extra = '', eval=F}
-bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
-bSugiRows <- bColumns[rawDataTesting$class=='s ',]
-bMixedRows <- bColumns[rawDataTesting$class=='d ',]
-bOtherRows <- bColumns[rawDataTesting$class=='o ',]
+bHinokiRows <- bColumns[rawDataTraining$class=='h ',]
+bSugiRows <- bColumns[rawDataTraining$class=='s ',]
+bMixedRows <- bColumns[rawDataTraining$class=='d ',]
+bOtherRows <- bColumns[rawDataTraining$class=='o ',]
 
+# Creates Boxplots of the bcolumns
 par(mfrow=c(2,2))
 boxplot(bHinokiRows, main="The b columns with class 'Hinoki' (a)"
         , xlab="The different b columns", ylab="Log2 transformed values")
@@ -112,12 +132,14 @@ The `pred_minus_obs` columns represent the Predicted spectral values minus actua
 The classes are unevenly represented. The dimensions are printed next, ordered by class type
 
 ```{r evenuneven, echo=F}
+# Splits the data based on classes
 bColumns <- rawDataTraining[2:10]
 bHinokiRows <- bColumns[rawDataTraining$class=='h ',]
 bSugiRows <- bColumns[rawDataTraining$class=='s ',]
 bMixedRows <- bColumns[rawDataTraining$class=='d ',]
 bOtherRows <- bColumns[rawDataTraining$class=='o ',]
 
+# Prints the amounts of classified classes
 pander("Hinoki amount: ") 
 pander(dim(bHinokiRows)[1])
 pander(", Sugi amount: ")
@@ -132,13 +154,17 @@ pander(dim(bOtherRows)[1])
 To check if there is missing values the dataset needs to be searched for NA values. 
   
 ```{r NAcheck, echo=F}
+# code to check if there are missing values
 pander("Is any number NA? ")
 pander(any(is.na(rawDataTraining)))
 ```
 
 This check has been done by using the `any()` function and the `is.na()` function.
 
-## hierarchical clustering
+## Correlation in the data
+The data has some correlation, the different columns respresent the different types of wavelength per date. The columns can be summed per 3 columns, the b1-b9 represent 3 dates evenly distributed. Meaning that 9 columns are a representation of 3 different dates. The next 9 columns are IDW interpolated dates in the same distribution of the first 9 b columns.
+
+## Hierarchical clustering
 A hierarchical clustering was performed to get a view of the data clustered into the different groups. Each group is clustered into different groups. As figure \ref{histColor} shows, the data is clustered mostly in the correct groups, however some of the data is not clustered right. This can have different reasons, especially when the Mixed class and Other class are not correctly clustered.
 ```{r histColorTXT, echo=F, eval=F}
 # Create the dend:
@@ -153,6 +179,7 @@ Forest_type[is_x] <- "Sugi"
 is_x <- grepl("d ", rawDataTraining$class)
 Forest_type[is_x] <- "Mixed"
 
+# settings for plot
 Forest_type <- factor(Forest_type)
 nForestTypes <- length(unique(Forest_type))
 cols_4 <- colorspace::rainbow_hcl(nForestTypes, c = 70, l = 50)
@@ -214,6 +241,21 @@ circle <- data.frame(x = cos(theta), y = sin(theta))
 # labs(x = "PC1", y = "PC2")
 ```
 
+# Creating datasets
+## In the research
+In the research the complete data set was used for training, the non interpolated data was used for reference to determine if geographical weighted values have an influence in the accuracy in classification.
+
+## Own Dataset
+To create an own dataset, a couple different things need to be taken into account. For example; how do I need to split my data to create a dataset that has the geographical weighted variables and a dataset that only has the spectral values of the image. This research checks the difference in geographically weighted variables and normal spectral data, compared to onl spectral data.
+
+## Evaluation
+To evaluate the ML algorith, the accuracy can be determined. In the research a stratified systematic unaligned sampling scheme was used to ensure that the pixels were dispersed across the entire image. This is a sampling scheme used for generating error matrices. 
+### Metric
+The metric that was used in the research was Moran's I \cite{Moran50}. This metric calculates how similar, on averag a sample is to other nearby samples. 
+
+
+
+
 
 
 \begin{thebibliography}{9}
@@ -227,6 +269,9 @@ Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted 
 \bibitem{PCA}
 \textit{ Introduction to Principal Component Analysis (PCA)} Viewed September 24 2018, from https://tgmstat.wordpress.com/2013/11/21/introduction-to-principal-component-analysis-pca/
 
+\bibitem{Russel}
+Russell, G., Congaltol., 1988 \textit{A Comparison of Sampling Schemes Used in Generating Error Matrices for Assessing the Accuracy of Maps Generated from Remotely Sensed Data }
+
 \end{thebibliography}
 
 \newpage
@@ -239,10 +284,10 @@ source("../scripts/BoxplotsbColumns.R")
 \newpage
 ## Figure \ref{bColumnsSorted}
 ```{r bColumnsSorted, echo=F, fig.height=6, fig.cap="\\label{bColumnsSorted}B columns divided by class attribute", out.extra = '', fig.pos='!h'}
-bHinokiRows <- bColumns[rawDataTesting$class=='h ',]
-bSugiRows <- bColumns[rawDataTesting$class=='s ',]
-bMixedRows <- bColumns[rawDataTesting$class=='d ',]
-bOtherRows <- bColumns[rawDataTesting$class=='o ',]
+bHinokiRows <- log(bColumns[rawDataTraining$class=='h ',])
+bSugiRows <- log(bColumns[rawDataTraining$class=='s ',])
+bMixedRows <- log(bColumns[rawDataTraining$class=='d ',])
+bOtherRows <- log(bColumns[rawDataTraining$class=='o ',])
 
 par(mfrow=c(2,2))
 boxplot(bHinokiRows, main="The b columns with class 'Hinoki' (a)"
