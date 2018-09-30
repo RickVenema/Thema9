@@ -365,6 +365,10 @@ write.arff(allDataToFile, file="../data/CompleteTrainingsData.arff")
 ## Quality metrics 
 Determining of quality metrics for the algorithm is an important part of assessing the ML algorithm. Each application in the real world has different requirements. To determine the quality metrics of a ML algorithm, the most important requirements need to be selected. In my case, the most important metric of my ML algorithm is speed. It is quite important that the algorithm can determine forest types on the fly. When a drone/airplane is flying over a forest, the algorthm needs to determine quickly what type of forest it is. Accuracy is not the most important part of the algorithm, it doesn't need to classify each part of the forest exactly right. 
 
+# Exploring Algorithms in Weka
+```{r}
+source("..\scripts\ReadingArffFiles.R")
+```
 
 
 \begin{thebibliography}{9}
