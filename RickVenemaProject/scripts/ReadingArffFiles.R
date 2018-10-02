@@ -1,7 +1,7 @@
-ReadARFF <- function(pathToFile){
-  library(RWeka)
-  out <- read.arff(pathToFile)
-  return (out)
-}
+library(RWeka)
 
-ReadARFF("../data/FirstResultsExperimenter.arff")
+FirstResultsExperimenter <- read.arff("RickVenemaProject/data/FirstResultsExperimenter.arff")
+SMO.data <- read.csv("RickVenemaProject/data/SVM-results-researchsettings.csv")
+
+boxplot(SMO.data$UserCPU_Time_millis_training)
+

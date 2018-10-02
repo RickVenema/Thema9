@@ -356,15 +356,25 @@ To create an own dataset, a couple different things need to be taken into accoun
 ```{r creatingDatasets}
 bColumnsToFile <- data.frame(rawDataTraining[2:10], rawDataTraining$class)
 allDataToFile <- data.frame(rawDataTraining[2:28], rawDataTraining$class)
+
+bColumnsToFileTesting <- data.frame(rawDataTesting[2:10], rawDataTesting$class)
+allDataToFileTesting <- data.frame(rawDataTesting[2:28], rawDataTesting$class)
+
 head(bColumnsToFile)
 write.arff(bColumnsToFile, file="../data/bColumnsOnlyData.arff")
 write.arff(allDataToFile, file="../data/CompleteTrainingsData.arff")
 
+write.arff(bColumnsToFileTesting, file="../data/bColumnsOnlyDataTesting.arff")
+write.arff(allDataToFileTesting, file="../data/CompleteTrainingsDataTesting.arff")
 ```
 
 ## Quality metrics 
 Determining of quality metrics for the algorithm is an important part of assessing the ML algorithm. Each application in the real world has different requirements. To determine the quality metrics of a ML algorithm, the most important requirements need to be selected. In my case, the most important metric of my ML algorithm is speed. It is quite important that the algorithm can determine forest types on the fly. When a drone/airplane is flying over a forest, the algorthm needs to determine quickly what type of forest it is. Accuracy is not the most important part of the algorithm, it doesn't need to classify each part of the forest exactly right. 
 
+# ML algorithm performance testing
+
+## Algortihms used in original paper
+The algorithm used in the original paper was a **SVM** with a **SVM-RBF** classifier. To further understand the **SVM** algorithms, Mountrakis et al.\cite{Mountrakis} was read. But to check if the chosen algorithm was the best, different algorithms were used to check the choice. For this validation, Jose et. al. {jose} was used. This paper uses 4 different algorithms to test speed and accuracy. These four algorithms are **MLP**, **LG**, **SVM**, and **C4.5** tree. These are the most used algorithms in remote sensing studies. First a significant amount of algorithms were used to give a general idea of the accuracy of a lot of different algorithms. These algorithms are: **ZeroR**, **OneR**, **SimpleLogistic**, **IBk**, **NaiveBayes**, **C4.5 (J48)**, **SVM (SMO)**, and **RandomForest**. To extend the standard algorithms, **LG**, **MLP** were added. To test these different algorithms, the Weka experimenter was used. This Experimenter can handle multiple files and multiple algorithms, and these results can be further processed with different tests implemented into the Weka experimenter.
 
 
 \begin{thebibliography}{9}
@@ -378,8 +388,14 @@ Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted 
 \bibitem{PCA}
 \textit{ Introduction to Principal Component Analysis (PCA)} Viewed September 24 2018, from https://tgmstat.wordpress.com/2013/11/21/introduction-to-principal-component-analysis-pca/
 
-\bibitem{Russel}
+\bibitem{Russel88}
 Russell, G., Congaltol., 1988 \textit{A Comparison of Sampling Schemes Used in Generating Error Matrices for Assessing the Accuracy of Maps Generated from Remotely Sensed Data }
+
+\bibitem{Mountrakis}
+Mountrakis, G.,Im, J., Ogole, C., 2011 \textit{A Support vector machines in remote sensing: A review }
+
+\bibitem{jose}
+Jose M. Pena, Pedro A. Gutierrez, Cesar Hervás-Martínez, Johan Six, Richard E. Plant and Francisca Lopez-Granados,  2014 \textit{Based Image Classification of Summer Crops with Machine Learning Methods }
 
 \end{thebibliography}
 
