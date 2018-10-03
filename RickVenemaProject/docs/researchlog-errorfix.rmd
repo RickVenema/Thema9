@@ -373,8 +373,17 @@ Determining of quality metrics for the algorithm is an important part of assessi
 
 # ML algorithm performance testing
 
-## Algortihms used in original paper
-The algorithm used in the original paper was a **SVM** with a **SVM-RBF** classifier. To further understand the **SVM** algorithms, Mountrakis et al.\cite{Mountrakis} was read. But to check if the chosen algorithm was the best, different algorithms were used to check the choice. For this validation, Jose et. al. {jose} was used. This paper uses 4 different algorithms to test speed and accuracy. These four algorithms are **MLP**, **LG**, **SVM**, and **C4.5** tree. These are the most used algorithms in remote sensing studies. First a significant amount of algorithms were used to give a general idea of the accuracy of a lot of different algorithms. These algorithms are: **ZeroR**, **OneR**, **SimpleLogistic**, **IBk**, **NaiveBayes**, **C4.5 (J48)**, **SVM (SMO)**, and **RandomForest**. To extend the standard algorithms, **LG**, **MLP** were added. To test these different algorithms, the Weka experimenter was used. This Experimenter can handle multiple files and multiple algorithms, and these results can be further processed with different tests implemented into the Weka experimenter.
+## Algortihms used
+The algorithm used in the original paper was a **SVM** with a **SVM-RBF** classifier. To further understand the **SVM** algorithms, Mountrakis et al.\cite{Mountrakis} was read. But to check if the chosen algorithm was the best, different algorithms were used to check the choice. For this validation, Jose et. al. \cite{jose} was used. This paper uses 4 different algorithms to test speed and accuracy. These four algorithms are **MLP**, **LG**, **SVM**, and **C4.5** tree. These are the most used algorithms in remote sensing studies. First a significant amount of algorithms were used to give a general idea of the accuracy of a lot of different algorithms. These algorithms are: **ZeroR**, **OneR**, **SimpleLogistic**, **IBk**, **NaiveBayes**, **C4.5 (J48)**, **SVM (SMO)**, and **RandomForest**. To extend the standard algorithms, **LG**, **MLP** were added. To test these different algorithms, the Weka experimenter was used. This Experimenter can handle multiple files and multiple algorithms, and these results can be further processed with different tests implemented into the Weka experimenter. These test were then read into R and processed on accuracy and speed. 
+
+```{r Algorithms}
+algorithmsTestbColumns <- read.csv("../data/SVM-results-researchsettings-bColumns.csv")
+algorithmsTestAll <- read.csv("../data/SVM-results-researchsettings-all.csv")
+
+sum(algorithmsTestbColumns$Percent_correct)/(dim(algorithmsTestbColumns)[1])
+sum(algorithmsTestAll$Percent_correct)/(dim(algorithmsTestAll)[1])
+
+```
 
 
 \begin{thebibliography}{9}
