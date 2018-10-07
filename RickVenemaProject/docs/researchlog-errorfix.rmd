@@ -15,7 +15,7 @@ library("pander")
 library(ggplot2)
 library(gplots)
 library(dendextend)
-library(RWeka)
+# library(RWeka)
 
 ```
 
@@ -353,7 +353,7 @@ In the research the complete data set was used for training, the non interpolate
 ## Own Dataset
 To create an own dataset, a couple different things need to be taken into account. For example; how do I need to split my data to create a dataset that has the geographical weighted variables and a dataset that only has the spectral values of the image. This research checks the difference in geographically weighted variables and normal spectral data, compared to onl spectral data. Meaning that 2 datasets needs to be created: the total amount of data, and only the spectral data.
 
-```{r creatingDatasets}
+```{r creatingDatasets, eval=F}
 bColumnsToFile <- data.frame(rawDataTraining[2:10], rawDataTraining$class)
 allDataToFile <- data.frame(rawDataTraining[2:28], rawDataTraining$class)
 
@@ -374,17 +374,23 @@ Determining of quality metrics for the algorithm is an important part of assessi
 # ML algorithm performance testing
 
 ## Algortihms used
-The algorithm used in the original paper was a **SVM** with a **SVM-RBF** classifier. To further understand the **SVM** algorithms, Mountrakis et al.\cite{Mountrakis} was read. But to check if the chosen algorithm was the best, different algorithms were used to check the choice. For this validation, Jose et. al. \cite{jose} was used. This paper uses 4 different algorithms to test speed and accuracy. These four algorithms are **MLP**, **LG**, **SVM**, and **C4.5** tree. These are the most used algorithms in remote sensing studies. First a significant amount of algorithms were used to give a general idea of the accuracy of a lot of different algorithms. These algorithms are: **ZeroR**, **OneR**, **SimpleLogistic**, **IBk**, **NaiveBayes**, **C4.5 (J48)**, **SVM (SMO)**, and **RandomForest**. To extend the standard algorithms, **LG**, **MLP** were added. To test these different algorithms, the Weka experimenter was used. This Experimenter can handle multiple files and multiple algorithms, and these results can be further processed with different tests implemented into the Weka experimenter. These test were then read into R and processed on accuracy and speed. 
+The algorithm used in the original paper was a **SVM** with a **SVM-RBF** classifier. To further understand the **SVM** algorithms, Mountrakis et al.\cite{Mountrakis} was read. But to check if the chosen algorithm was the best, different algorithms were used to check the choice. For this validation, Jose et. al. \cite{jose} was used. This paper uses 4 different algorithms to test speed and accuracy. These four algorithms are **MLP**, **LG**, **SVM**, and **C4.5** tree. These are the most used algorithms in remote sensing studies. First a significant amount of algorithms were used to give a general idea of the accuracy of a lot of different algorithms. These algorithms are: **ZeroR**, **OneR**, **SimpleLogistic**, **IBk**, **NaiveBayes**, **C4.5 (J48)**, **SVM (SMO)**, and **RandomForest**. To extend the standard algorithms, **LG**, **MLP** were added. To test these different algorithms, the Weka experimenter was used. This Experimenter can handle multiple files and multiple algorithms, and these results can be further processed with different tests implemented into the Weka experimenter. These test were then read into R and processed on accuracy and speed. A confusion matrix was also made with the average TP, FP, TN, and FN. 
 
-```{r Algorithms}
+```{r Algorithms, echo=F}
 algorithmsTestbColumns <- read.csv("../data/SVM-results-researchsettings-bColumns.csv")
 algorithmsTestAll <- read.csv("../data/SVM-results-researchsettings-all.csv")
 
-sum(algorithmsTestbColumns$Percent_correct)/(dim(algorithmsTestbColumns)[1])
-sum(algorithmsTestAll$Percent_correct)/(dim(algorithmsTestAll)[1])
+pander("Only spectral values dataset accuracy: ")
+pander(sum(algorithmsTestbColumns$Percent_correct)/(dim(algorithmsTestbColumns)[1]))
+pander(". Complete dataset accuracy: ")
+pander(sum(algorithmsTestAll$Percent_correct)/(dim(algorithmsTestAll)[1]))
+pander(".")
 
 ```
 
+This means that the accuracy increases when the interpolated values are used. This is a confirmation to the original study. The question I want to answer, is, if this is the best algorithm to use. For this, different algorithms needed to be tested. To make the data more specific, only the complete dataset was used. Meaning that all 27 columns were used to evaluate the algorithm. Based on these results, more can be said about the used algorithm.
+  
+First, the standard algorithmes are evaluated, these can give a base line, and if there is a standard algorithm that outperforms the rest, that algorithm needs to be examined further.
 
 \begin{thebibliography}{9}
 
