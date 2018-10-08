@@ -1,0 +1,43 @@
+---
+title: "Machine Learning Algorithms in Combination with Geographically Weighted Variables"
+author: "Rick Venema"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+    toc: True
+    fig_caption: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+library("pander")
+
+```
+
+\newpage
+
+# Results
+The determination of the best algorithm to use on Spectral Values with geographically weighted variables has been done using an EDA first, then different algorithms were tested on speed and accuracy. After selecting the best 2 algorithms, these were examined further to determine the best algorithm for the dataset used in this research.
+
+## Exploratory Data Analysis
+### Layout of the data
+After first downloading the raw dataset, a first impression of the data was needed. When trying to understand the data, the data needs to be examined to determine what the best strategy is for further actions. The results of this Exploratory Data Analysis (EDA) exist to get an impression on what the dataset is looking like. First the size of the dataset was determined. The dimensions are 9 attributes representing the measured spectral values, 18 attributes representing IDW interpolated values, these are further discussed later on, and 1 class attribute. The class attribute can be given 4 different values, the first two being "*H*", which stands for Hinoki *(Chamaecyparis obtusa)*, and "*S*", which stands for Sugi (*Cryptomeria japonica*). These 2 class labels represent the two different types of trees found in the forest that was used to create the dataset. Furthermore, there are 2 more labels that the class attribute can get. These 2 labels represent the Mixed label, displayed as "*D*", and the "*O*" label. These labels represent a mixed part and a non forest label respectively.
+
+### Descriptive Statistics
+In table \ref{ClassDistribution}, the distribution of the class label can be seen. This table represents how the different labels are dispersed in the data set that was used. As we can see in the table, the distribution of the different labels is uneven, meaning that some classes are represented more than others. The Other label is the least frequent label, with 37 instances. What stands out, is the mixed label. This label is as frequent as the only one tree type labels, it be with a little difference. 
+
+```{r ClassDistributionTable}
+set.caption("\\label{ClassDistribution} Distribution of the different labels of the Class attribute.")
+classDistribution <- data.frame(c("Hinoki", "Sugi", "Other", "Mixed"), c(48, 59, 37, 54))
+colnames(classDistribution) <- c("Class label", "Amount")
+
+pander(classDistribution)
+
+```
+
+The dataset was searched for any missing values, but because of the fact that the dataset is made up by measured spectral values of an ASTER image set. Meaning if there were any NA values, the measurement went wrong. Without any missing values, there is no need to remove any instances. 
+
+
+### Clustering of the data
+
+
+# Discussion & Conclusion
