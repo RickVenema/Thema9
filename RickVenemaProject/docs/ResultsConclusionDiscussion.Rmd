@@ -4,14 +4,18 @@ author: "Rick Venema"
 date: "`r Sys.Date()`"
 output: 
   pdf_document:
-    toc: True
     fig_caption: yes
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F)
 library("pander")
-
+library(ggplot2)
+library(gplots)
+library(dendextend)
 ```
+\begin{abstract}
+This paper extends the paper by Johnson et. al. 2012 \cite{Johnson12}, further examining different Machine Learning algorithms for ASTER image classifiction of forest types in a Japanese forest containing Sugi (\textit{Cryptomeria japonica}) and Hinoki (\textit{Chamaecyparis obtusa}) trees. This paper first looks into the dataset that was used in the original paper and tests different Machine Learning algorithms to create a model that can classify the different tree types quick and accurate. This has been done by using Weka, and the standard settings. Exept Support Vector Machines (SVMs), which has been set up with the settings used in the original paper.
+\end{abstract}
 
 \newpage
 
@@ -38,6 +42,79 @@ The dataset was searched for any missing values, but because of the fact that th
 
 
 ### Clustering of the data
+To get a view of the dispersion of the data, a hierachial clustering was performed. This gives a good view on how the data is layout, if the data is clustered correctly, the algorihtm will have more chance of being accurate, and thus performing much better. In this case, the data is clustered mostly correct, with just a few different misclustered datapoints. These are most frequent in the "Other" and "Mixed" class, thus representing a significant simularity in these two class labels. The cluster dendogram can be viewed in figure \ref{ClassDistribution}. 
+```{r IMAGE, echo=F, warning=FALSE, fig.height=8, fig.cap="\\label{HC}Hierarchical clustering of the trainings data used to train ML models. The different colors represent different class labels.", fig.pos="!h", out.extra=''}
+source( "../scripts/HC.R")
+```
+
+
+\clearpage
+
+## Algorithm performance
+### Batch run
+To determine which algorithm that performs best on this dataset, a batch run was executed with all the standard algorithms. These were executed in Weka and the standard settings were used, except for the SVM which used the setting in the original paper.
+
+The accuracy of these standard algorithms can be seen in table \ref{Accuracy}. The table shows significant differences in the different algorithms, however, the more advanced algorithms perform much better. MLP and SVM perform best on this dataset, meaning that these 2 algorithms need further examining to get the best algorithm for the dataset used. 
+
+```{r Accuracy}
+set.caption("\\label{Accuracy} Accuracy of the different algorithms with the trainings data used.")
+source("../scripts/ML_Accuracy.R")
+pander( averageCorrect.dataframe)
+```
+
+C4.5 does also perform quite well, but has not the accuracy that SVM or MLP have, meaning that this algorithm is not the best for accuracy in this specific dataset. But to incorporate speed into the decision, a speed test was performed. These results were gathered on a Intel Core i7 7700k and 16GB of RAM memory. 
+
+This results can be seen in table \ref{TrainingTime}, which represent the time it took to train the different models. One time stands out: MLP. This algorithm took a long time to train with little data. This is due to the fact that the algorithm uses an Artificial Neural Network (ANN).
+```{r TrainingSpeed}
+set.caption("\\label{TrainingTime}Time used for each algorithm to train the algorithm")
+source("../scripts/TrainingSpeed.R")
+pander(averageTimeTraining)
+
+```
+
+These elapsed times give a view of the time elapsed for training, but there is more interest in classification time, this is because the classification algorithm needs to be fast as well. This is because of the fact that the algorithm needs to classify on the go. 
+
+```{r TestingSpeed}
+set.caption("\\label{TestingTime}Time used for each algorithm to classify new instances")
+
+source("../scripts/TestingSpeed.R")
+pander(averageTimeTrainingTesting)
+
+```
+
 
 
 # Discussion & Conclusion
+
+
+
+\clearpage
+
+\begin{thebibliography}{9}
+
+\bibitem{Johnson12}
+Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted variables for image classification. Remote Sensing Letters}, 3 (6), 491-499.
+
+\bibitem{Dataset}
+\textit{Forest type mapping Data Set} Retrieved September 11, 2018, from https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping
+
+\bibitem{PCA}
+\textit{ Introduction to Principal Component Analysis (PCA)} Viewed September 24 2018, from https://tgmstat.wordpress.com/2013/11/21/introduction-to-principal-component-analysis-pca/
+
+\bibitem{Russel88}
+Russell, G., Congaltol., 1988 \textit{A Comparison of Sampling Schemes Used in Generating Error Matrices for Assessing the Accuracy of Maps Generated from Remotely Sensed Data }
+
+\bibitem{Mountrakis}
+Mountrakis, G.,Im, J., Ogole, C., 2011 \textit{A Support vector machines in remote sensing: A review }
+
+\bibitem{jose}
+Jose M. Pena, Pedro A. Gutierrez, Cesar Hervás-Martínez, Johan Six, Richard E. Plant and Francisca Lopez-Granados,  2014 \textit{Based Image Classification of Summer Crops with Machine Learning Methods }
+
+\bibitem{Raczko}
+Raczko, E., Zagajewski, B. 2017 \textit{Comparison of support vector machine, random forest and neural network classifiers for tree species classification on airborne hyperspectral APEX images}
+
+\bibitem{Zanaty}
+Zanaty, E.A., 2012 \textit{Support Vector Machines (SVMs) versus Multilayer Perception (MLP) in data classification}
+
+\end{thebibliography}
+

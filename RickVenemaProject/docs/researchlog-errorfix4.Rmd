@@ -248,7 +248,7 @@ k234 <- cutree(dend, k = 2:4)
 labels_colors(dend) <- colForestType[order.dendrogram(dend)]
 
 par(mar = c(4,1,1,12))
-plot(dend, horiz = TRUE)
+plot(dend, horiz = TRUE, main="Hierarchical clustering of the trainingsset ")
 colored_bars(cbind(k234[,3:1], colForestType), dend, rowLabels = c(paste0("k = ", 4:2), "Forest Type"), horiz = TRUE)
 legend("topleft", legend = levels(Forest_type), fill = cols_4)
 ```
