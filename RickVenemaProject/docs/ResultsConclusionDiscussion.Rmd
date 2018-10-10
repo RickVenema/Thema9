@@ -50,6 +50,33 @@ source( "../scripts/HC.R")
 
 \clearpage
 
+## PCA
+To get see how the data is dispersed, a PCA was performed to reduce the dimensionality of the dataset. The three different dates were clustered together to see if there was a significant difference in dates. First a a summary of the data is shown in table \ref{sumPCA}. This gives a first impresion on the dispersion of the data. In this case significant differences can be seen, the data from 26 September 2010 are much lower, exept for the max value, meaning that the datapoints are mostly lower than the other dates, but it has more significant outliners.
+
+```{r PCASummary}
+
+set.caption("\\label{sumPCA}Summary of the PCA data")
+source("../scripts/SumPCA.R")
+pander(summary(PCA.data))
+```
+
+```{r PCA, fig.cap="\\label{PCA}A PCA performed on the b columns data combined by date, september, march, may", fig.pos="!h", out.extra=''}
+theta <- seq(0,2*pi,length.out = 100)
+circle <- data.frame(x = cos(theta), y = sin(theta))
+
+p <- ggplot(circle,aes(x,y)) + geom_path() +ggtitle("PCA performed on the b columns combined on date")
+
+loadings <- data.frame(PCA.bColumns$rotation, 
+                       .names = row.names(PCA.bColumns$rotation))
+p + geom_text(data=loadings, 
+              mapping=aes(x = PC1, y = PC2, label = .names, colour = .names)) +
+  coord_fixed(ratio=1) +
+  labs(x = "PC1", y = "PC2")
+
+```
+
+In figure \ref{PCA} the 
+
 ## Algorithm performance
 ### Batch run
 To determine which algorithm that performs best on this dataset, a batch run was executed with all the standard algorithms. These were executed in Weka and the standard settings were used, except for the SVM which used the setting in the original paper.
