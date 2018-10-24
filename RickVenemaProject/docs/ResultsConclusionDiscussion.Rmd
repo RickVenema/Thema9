@@ -1,5 +1,5 @@
 ---
-title: "Machine Learning Algorithms in Combination with Geographically Weighted Variables"
+title: "Machine Learning Algorithms in Classification of Forest Types with Geographically Weighted Variables"
 author: "Rick Venema"
 date: "`r Sys.Date()`"
 output: 
@@ -14,7 +14,7 @@ library(gplots)
 library(dendextend)
 ```
 \begin{abstract}
-This paper extends the paper by Johnson et. al. 2012 \cite{Johnson12}, further examining different Machine Learning algorithms for ASTER image classifiction of forest types in a Japanese forest containing Sugi (\textit{Cryptomeria japonica}) and Hinoki (\textit{Chamaecyparis obtusa}) trees. This paper first looks into the dataset that was used in the original paper and tests different Machine Learning algorithms to create a model that can classify the different tree types quick and accurate. This has been done by using Weka, and the standard settings. Exept Support Vector Machines (SVMs), which has been set up with the settings used in the original paper.
+This paper extends the paper by Johnson et. al. 2012 \cite{Johnson12}, further examining different Machine Learning algorithms for ASTER image classifiction of forest types in a Japanese forest containing Sugi (\textit{Cryptomeria japonica}) and Hinoki (\textit{Chamaecyparis obtusa}) trees. This paper first looks into the dataset that was used in the original paper and tests different Machine Learning algorithms to create a model that can classify the different tree types quick and accurate. This has been done by using Weka, and the standard settings. Exept Support Vector Machines (SVMs), which has been set up with the settings used in the original paper. MLP has shown significantly good accuracy based on tests run on different algorithms with the original dataset.
 \end{abstract}
 
 \newpage
@@ -75,7 +75,7 @@ p + geom_text(data=loadings,
 
 ```
 
-In figure \ref{PCA} the 
+In figure \ref{PCA} the PCA can been seen, this PCA represents the dimensionality of the data. As we can see, the the 26 September date is on a different position than the 2 other dates. This can be explained by the simple fact that seasons exist. The 26 September date is taken in the fall, and the 2 other dates are taken in spring and summer.
 
 ## Algorithm performance
 ### Batch run
@@ -99,7 +99,7 @@ pander(averageTimeTraining)
 
 ```
 
-These elapsed times give a view of the time elapsed for training, but there is more interest in classification time, this is because the classification algorithm needs to be fast as well. This is because of the fact that the algorithm needs to classify on the go. 
+These elapsed times give a view of the time elapsed for training, but there is more interest in classification time, this is because the classification algorithm needs to be fast as well. This is because of the fact that the algorithm needs to classify on the go. Here, we can see that SVM and MLP are not the quickest algorithms, but perform quite quick. 
 
 ```{r TestingSpeed}
 set.caption("\\label{TestingTime}Time used for each algorithm to classify new instances")
@@ -109,9 +109,25 @@ pander(averageTimeTrainingTesting)
 
 ```
 
+To view if there is a significant difference between SVM and MLP, a ROC curve was made of the 2 different algorithms. This roc curve can be found below.
 
 
-# Discussion & Conclusion
+
+\begin{figure}[h]
+  \centering
+    \includegraphics{roc}
+    \caption{The ROC Curve for the SVM and MLP algorithm}
+\end{figure}
+
+# Discussion
+The results show that there are significant differences in the accuracy and speed of different algorithms. We can see, that SVM and MLP performed best compared to other algorithms. SVM has been used in the original paper, but MLP performs as good. MLP uses a neural network and can handle more input, and can generate more output, which makes classification more accurate when there are related attributes. SVM is a much simpler algorithm, which only takes one input. Looking at the difference in classification time, SVM and MLP perform significantly slower than other algorithms, but the time it takes to classify is close to 0 seconds, meaning that these algorithms are quick enough to quickly classify the different forest types on the fly. The time training, however takes much longer with MLP. This is due to the fact that MLP has hidden layers with nodes, which take a long time to calculate and create a model. In the case of this dataset, training time does not matter, when the model is trained, it never needs to be trained again, making training time not an important metric to choose for MLP or SVM. SVM is an algorithm that has been used a lot in image classification,  the original paper uses SVM as well, but the results shown in the table with accuracies show that MLP has also a great accuracy based on the trainingsset. The time training are run on a normal PC, and thus the time used for training and testing can be improved by using more advanced methods like servers and GPU algorithms. MLP has not much great implementations to run on a GPU, which can decrease the time needed to train and classify the different forest types.
+  
+As we can see in the ROC curve that was made for the SVM and MLP algorithms, there is little difference in the accuracy, meaning that both algorithms perform equal. The date can give different results, the dimensionality that has been shown in the PCA, represents this. The dataset only included 3 dates, which can give not quite accurate results, because each season, and for that matter, dates, give different spectral values. Meaning that more dates can be added to get an algorithm perform better on new datasets.
+
+# Conclusion
+SVM and MLP are both great algorithms to use with the dataset in this paper. The final choice was made on MLP, because the setting can be modified more to create more accurate results. However, to use MLP or SVM on other datasets can give different results. Even on same datasets different results can be shown with the same algorithms that have been used, in the original paper, SVM resulted the best algorithm, but this paper, shows that MLP gives accurate results as well, and thus not a lot is clear about the best algorithm for each different dataset, which can be further explored to create a model that will determine the best algorithm that can be used with the different kinds of datasets. Also more advanced computer techniques could also improve the time for training and testing ML algorithms. Simple algorithms like SVM can be used, but also more advanced algorithms with more layers can be used, which can be easily modified to run faster on multiple cores, but that will need further research on improving existing algorithms to work more efficient. 
+
+Adding more dates, and including more variables can also give more accurate results. These additional variables can be texture variation of the soil, or biomass. The classification with different datatypes can also further improve the results, high-resolution imagery or hypersprectral imagery for example.
 
 
 
@@ -135,7 +151,7 @@ Russell, G., Congaltol., 1988 \textit{A Comparison of Sampling Schemes Used in G
 Mountrakis, G.,Im, J., Ogole, C., 2011 \textit{A Support vector machines in remote sensing: A review }
 
 \bibitem{jose}
-Jose M. Pena, Pedro A. Gutierrez, Cesar Hervás-Martínez, Johan Six, Richard E. Plant and Francisca Lopez-Granados,  2014 \textit{Based Image Classification of Summer Crops with Machine Learning Methods }
+Jose M. Pena, Pedro A. Gutierrez, Cesar Herves-Martinez, Johan Six, Richard E. Plant and Francisca Lopez-Granados,  2014 \textit{Based Image Classification of Summer Crops with Machine Learning Methods }
 
 \bibitem{Raczko}
 Raczko, E., Zagajewski, B. 2017 \textit{Comparison of support vector machine, random forest and neural network classifiers for tree species classification on airborne hyperspectral APEX images}
