@@ -1,0 +1,196 @@
+---
+title: "Machine Learning Algorithms in Combination with Geographically Weighted Variables"
+author: "Rick Venema"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+    fig_caption: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+library("pander")
+library(ggplot2)
+library(gplots)
+library(dendextend)
+library(RWeka)
+```
+\begin{abstract}
+This paper extends the paper by Johnson et. al. 2012 \cite{Johnson12}, further examining different Machine Learning algorithms for ASTER image classifiction of forest types in a Japanese forest containing Sugi (\textit{Cryptomeria japonica}) and Hinoki (\textit{Chamaecyparis obtusa}) trees. This paper first looks into the dataset that was used in the original paper and tests different Machine Learning algorithms to create a model that can classify the different tree types quick and accurate. This has been done by using Weka, and the standard settings. Exept Support Vector Machines (SVMs), which has been set up with the settings used in the original paper.
+\end{abstract}
+
+\newpage
+
+# Introduction
+The use of machine learning in classifying different forest types has been a subject of research for a long time, however, no universal standard classification algorithm has been defined to classify forest types. An universal model can be quite difficult to create, this is because of the fact that a lot of different datacollecting methods exists and give different results. In the original paper by Johnson et al. \cite{Johnson12}, SVM was performed, however, other algorithms such as Logistic regression (LR), MLP, or C4.5 \cite{jose}. To determine the best classification algorithm, different algorithms needs to be tested on the data, with different settings. An unified model that can classify all the different forest types needs more refining and more data, such as soil texture, and is not something that can be done easily. A solution to the problem of an unified model, is creating different models that are optimized for the different forest types that exists. This however comes down to the same problem that exists today. 
+  
+Classification of forest types can give a setup to a lot of different possibilities in agriculture and other geographical research areas. In agriculture the use of drones has increased significantly over the years, and is an active field of research where Machine Learning can have a lot of different uses, and can be improving the crop quality when used correctly. 
+
+However, before this all this is possible, there needs to be more research of the classification process. This study looks at the classificiation of forest types with different algorithms, and the general question that has been asked is, is what difference is there between different machine learnign algorithms in the classification of forest types, taking geographical weighted variables into account? 
+
+\clearpage
+
+# Materials and Methods
+In this study the Forest type classfication set was used\cite{Dataset}. This dataset has 27 different columns, the first 9 are the measured spectral values of the images, the next 18 different columns are the Interpolated values of the different forest type, based on Moran's I. Which is defined as:
+\begin{equation}
+I = \frac{N}{W}\frac{\sum_{i}\sum_{j}w_{ij}(x_{i}-\bar{x}(x_{j}-\bar{x}))}{\sum_{i}(x_{i}-\bar{x})^2}
+\end{equation}
+
+This interpolation was already done to the dataset that was used. Thus appending the measured spectral values with the 18 columns with the calculated interpolated values.
+
+To determine which algorithm performs the best on the dataset used, different algorithms were used in Weka. The most standaard algorithms were used, all with the standard settings: ZeroR, OneR, IBk, C4.5, Logistic Regression, Mulitlayer Perceptron, Random Forest, Simple Logistic, and Support Vector Machine. Multilayer Perceptron was however chosen because of the fact that is a common algorithm used in the Geographical Information Science (GIS) community\cite{jose}. This algorithm performs better on multiclass classification problems, and can thus perform better or equal to svm\cite{Zanaty}. SVM has been used in the classification of forest types by Johnson et al. 2012\cite{Johnson12}.
+
+For the Exploratory data analysis different programs were used. Most of this was done in R in combination with R studio. A hierarchial cluster plot was made using the `hclust` method which is in the standard library of R. The Euclidian distance was used to calculate the distances, which is given by the next formula:
+\begin{equation}
+||a-b||_{2} = \sqrt{\sum_{i}(a_{i}-b_{i})^2}
+\end{equation}
+The PCA was made with the use of the `ggplot` library which increases the readability of the plots by making them more clear with better backgrounds and better title and caption options. A PCA plot can give an insight at the different groups that can be made, and can give new and better insights at how the data can be clustered over multiple dimensions.
+
+For batch running different algorithms the weka experimenter was used to compare the different algorithms easy and give clear insights which algorithms perform best. The experimenter used, was from Weka 3.8 which runs on Java. For the C4.5, J48 was used. This is due to the fact that J48 is a Java implementation of the C4.5 algorithm.
+
+To create the roc curve, the knowledge flow of weka 3.8 was used to compare the roc curves of the algorithms that performed best. This knowledge flow can be setup via weka and has a gui to execute the different algorithms next to each other in parallel.
+
+\clearpage
+
+# Results
+The determination of the best algorithm to use on Spectral Values with geographically weighted variables has been done using an EDA first, then different algorithms were tested on speed and accuracy. After selecting the best 2 algorithms, these were examined further to determine the best algorithm for the dataset used in this research.
+
+## Exploratory Data Analysis
+### Layout of the data
+After first downloading the raw dataset, a first impression of the data was needed. When trying to understand the data, the data needs to be examined to determine what the best strategy is for further actions. The results of this Exploratory Data Analysis (EDA) exist to get an impression on what the dataset is looking like. First the size of the dataset was determined. The dimensions are 9 attributes representing the measured spectral values, 18 attributes representing IDW interpolated values, these are further discussed later on, and 1 class attribute. The class attribute can be given 4 different values, the first two being "*H*", which stands for Hinoki *(Chamaecyparis obtusa)*, and "*S*", which stands for Sugi (*Cryptomeria japonica*). These 2 class labels represent the two different types of trees found in the forest that was used to create the dataset. Furthermore, there are 2 more labels that the class attribute can get. These 2 labels represent the Mixed label, displayed as "*D*", and the "*O*" label. These labels represent a mixed part and a non forest label respectively.
+
+### Descriptive Statistics
+In table \ref{ClassDistribution}, the distribution of the class label can be seen. This table represents how the different labels are dispersed in the data set that was used. As we can see in the table, the distribution of the different labels is uneven, meaning that some classes are represented more than others. The Other label is the least frequent label, with 37 instances. What stands out, is the mixed label. This label is as frequent as the only one tree type labels, it be with a little difference. 
+
+```{r ClassDistributionTable}
+set.caption("\\label{ClassDistribution} Distribution of the different labels of the Class attribute.")
+classDistribution <- data.frame(c("Hinoki", "Sugi", "Other", "Mixed"), c(48, 59, 37, 54))
+colnames(classDistribution) <- c("Class label", "Amount")
+
+pander(classDistribution)
+
+```
+
+The dataset was searched for any missing values, but because of the fact that the dataset is made up by measured spectral values of an ASTER image set. Meaning if there were any NA values, the measurement went wrong. Without any missing values, there is no need to remove any instances. 
+
+
+### Clustering of the data
+To get a view of the dispersion of the data, a hierachial clustering was performed. This gives a good view on how the data is layout, if the data is clustered correctly, the algorihtm will have more chance of being accurate, and thus performing much better. In this case, the data is clustered mostly correct, with just a few different misclustered datapoints. These are most frequent in the "Other" and "Mixed" class, thus representing a significant simularity in these two class labels. The cluster dendogram can be viewed in figure \ref{ClassDistribution}. 
+```{r IMAGE, echo=F, warning=FALSE, fig.height=8, fig.cap="\\label{HC}Hierarchical clustering of the trainings data used to train ML models. The different colors represent different class labels.", fig.pos="!h", out.extra=''}
+source( "../scripts/HC.R")
+```
+
+
+\clearpage
+
+## PCA
+To get see how the data is dispersed, a PCA was performed to reduce the dimensionality of the dataset. The three different dates were clustered together to see if there was a significant difference in dates. First a a summary of the data is shown in table \ref{sumPCA}. This gives a first impresion on the dispersion of the data. In this case significant differences can be seen, the data from 26 September 2010 are much lower, exept for the max value, meaning that the datapoints are mostly lower than the other dates, but it has more significant outliners.
+
+```{r PCASummary}
+
+set.caption("\\label{sumPCA}Summary of the PCA data")
+source("../scripts/SumPCA.R")
+pander(summary(PCA.data))
+```
+
+```{r PCA, fig.cap="\\label{PCA}A PCA performed on the b columns data combined by date, september, march, may", fig.pos="!h", out.extra=''}
+theta <- seq(0,2*pi,length.out = 100)
+circle <- data.frame(x = cos(theta), y = sin(theta))
+
+p <- ggplot(circle,aes(x,y)) + geom_path() +ggtitle("PCA performed on the b columns combined on date")
+
+loadings <- data.frame(PCA.bColumns$rotation, 
+                       .names = row.names(PCA.bColumns$rotation))
+p + geom_text(data=loadings, 
+              mapping=aes(x = PC1, y = PC2, label = .names, colour = .names)) +
+  coord_fixed(ratio=1) +
+  labs(x = "PC1", y = "PC2")
+
+```
+
+In figure \ref{PCA} the PCA can been seen, this PCA represents the dimensionality of the data. As we can see, the the 26 September date is on a different position than the 2 other dates. This can be explained by the simple fact that seasons exist. The 26 September date is taken in the fall, and the 2 other dates are taken in spring and summer.
+
+## Algorithm performance
+### Batch run
+To determine which algorithm that performs best on this dataset, a batch run was executed with all the standard algorithms. These were executed in Weka and the standard settings were used, except for the SVM which used the setting in the original paper.
+
+The accuracy of these standard algorithms can be seen in table \ref{Accuracy}. The table shows significant differences in the different algorithms, however, the more advanced algorithms perform much better. MLP and SVM perform best on this dataset, meaning that these 2 algorithms need further examining to get the best algorithm for the dataset used. 
+
+```{r Accuracy}
+set.caption("\\label{Accuracy} Accuracy of the different algorithms with the trainings data used.")
+source("../scripts/ML_Accuracy.R")
+pander( averageCorrect.dataframe)
+```
+
+C4.5 does also perform quite well, but has not the accuracy that SVM or MLP have, meaning that this algorithm is not the best for accuracy in this specific dataset. But to incorporate speed into the decision, a speed test was performed. These results were gathered on a Intel Core i7 7700k and 16GB of RAM memory. 
+
+This results can be seen in table \ref{TrainingTime}, which represent the time it took to train the different models. One time stands out: MLP. This algorithm took a long time to train with little data. This is due to the fact that the algorithm uses an Artificial Neural Network (ANN).
+```{r TrainingSpeed}
+set.caption("\\label{TrainingTime}Time used for each algorithm to train the algorithm")
+source("../scripts/TrainingSpeed.R")
+pander(averageTimeTraining)
+
+```
+
+These elapsed times give a view of the time elapsed for training, but there is more interest in classification time, this is because the classification algorithm needs to be fast as well. This is because of the fact that the algorithm needs to classify on the go. Here, we can see that SVM and MLP are not the quickest algorithms, but perform quite quick. 
+
+```{r TestingSpeed}
+set.caption("\\label{TestingTime}Time used for each algorithm to classify new instances")
+
+source("../scripts/TestingSpeed.R")
+pander(averageTimeTrainingTesting)
+
+```
+
+To view if there is a significant difference between SVM and MLP, a ROC curve was made of the 2 different algorithms. This roc curve can be found below.Between the different roc curves there is no significant difference.
+
+```{r Roc}
+rocData <- read.arff("../data/roc_SVM_MLP.arff")
+plot(rocData$`True Positives` ~ rocData$`False Positives`, type="l", xlab="False Positives", ylab="True Positives", 
+     main="ROC curve made of the SVM vs the MLP algorithm for \n the classification of different forest types")
+```
+
+\clearpage
+
+# Discussion
+The results show that there are significant differences in the accuracy and speed of different algorithms. We can see, that SVM and MLP performed best compared to other algorithms. SVM has been used in the original paper, but MLP performs as good. MLP uses a neural network and can handle more input, and can generate more output, which makes classification more accurate when there are related attributes. SVM is a much simpler algorithm, which only takes one input. Looking at the difference in classification time, SVM and MLP perform significantly slower than other algorithms, but the time it takes to classify is close to 0 seconds, meaning that these algorithms are quick enough to quickly classify the different forest types on the fly. The time training, however takes much longer with MLP. This is due to the fact that MLP has hidden layers with nodes, which take a long time to calculate and create a model. In the case of this dataset, training time does not matter, when the model is trained, it never needs to be trained again, making training time not an important metric to choose for MLP or SVM. SVM is an algorithm that has been used a lot in image classification,  the original paper uses SVM as well, but the results shown in the table with accuracies show that MLP has also a great accuracy based on the trainingsset. The time training are run on a normal PC, and thus the time used for training and testing can be improved by using more advanced methods like servers and GPU algorithms. MLP has not much great implementations to run on a GPU, which can decrease the time needed to train and classify the different forest types.
+  
+As we can see in the ROC curve that was made for the SVM and MLP algorithms, there is little difference in the accuracy, meaning that both algorithms perform equal. The date can give different results, the dimensionality that has been shown in the PCA, represents this. The dataset only included 3 dates, which can give not quite accurate results, because each season, and for that matter, dates, give different spectral values. Meaning that more dates can be added to get an algorithm perform better on new datasets.
+
+# Conclusion
+SVM and MLP are both great algorithms to use with the dataset in this paper. The final choice was made on MLP, because the setting can be modified more to create more accurate results. However, to use MLP or SVM on other datasets can give different results. Even on same datasets different results can be shown with the same algorithms that have been used, in the original paper, SVM resulted the best algorithm, but this paper, shows that MLP gives accurate results as well, and thus not a lot is clear about the best algorithm for each different dataset, which can be further explored to create a model that will determine the best algorithm that can be used with the different kinds of datasets. Also more advanced computer techniques could also improve the time for training and testing ML algorithms. Simple algorithms like SVM can be used, but also more advanced algorithms with more layers can be used, which can be easily modified to run faster on multiple cores, but that will need further research on improving existing algorithms to work more efficient. 
+
+Adding more dates, and including more variables can also give more accurate results. These additional variables can be texture variation of the soil, or biomass. The classification with different datatypes can also further improve the results, high-resolution imagery or hypersprectral imagery for example.
+
+# Project proposal
+There are some possibilities to extend this research into different projects, the first being to write a complete wrapper that can take live drone images that are sent to the program and run them thru the trained model. The purpose of that program would be to be able to connect a pc to it, and fly with a plane to map the entire forest in one go. The deliverable of this project would be to have a functional program that can take information from a camera to classify different forest types. This can be tested to run it on a raspberry pi with a camera for testing purposes. This program can be very useful to foresters that need to keep an eye on the forest and this program can help visualizing problems that may not be visible to the naked eye. 
+
+\clearpage
+
+\begin{thebibliography}{9}
+
+\bibitem{Johnson12}
+Johnson, B., Tateishi, R., Xie, Z., 2012. \textit{Using geographically-weighted variables for image classification. Remote Sensing Letters}, 3 (6), 491-499.
+
+\bibitem{Dataset}
+\textit{Forest type mapping Data Set} Retrieved September 11, 2018, from https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping
+
+\bibitem{PCA}
+\textit{ Introduction to Principal Component Analysis (PCA)} Viewed September 24 2018, from https://tgmstat.wordpress.com/2013/11/21/introduction-to-principal-component-analysis-pca/
+
+\bibitem{Russel88}
+Russell, G., Congaltol., 1988 \textit{A Comparison of Sampling Schemes Used in Generating Error Matrices for Assessing the Accuracy of Maps Generated from Remotely Sensed Data }
+
+\bibitem{Mountrakis}
+Mountrakis, G.,Im, J., Ogole, C., 2011 \textit{A Support vector machines in remote sensing: A review }
+
+\bibitem{jose}
+Jose M. Pena, Pedro A. Gutierrez, Cesar Herves-Martinez, Johan Six, Richard E. Plant and Francisca Lopez-Granados,  2014 \textit{Based Image Classification of Summer Crops with Machine Learning Methods }
+
+\bibitem{Raczko}
+Raczko, E., Zagajewski, B. 2017 \textit{Comparison of support vector machine, random forest and neural network classifiers for tree species classification on airborne hyperspectral APEX images}
+
+\bibitem{Zanaty}
+Zanaty, E.A., 2012 \textit{Support Vector Machines (SVMs) versus Multilayer Perception (MLP) in data classification}
+
+\end{thebibliography}
+

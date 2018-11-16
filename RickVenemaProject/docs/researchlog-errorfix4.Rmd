@@ -15,8 +15,8 @@ library("pander")
 library(ggplot2)
 library(gplots)
 library(dendextend)
-# library(RWeka)
-
+library(RWeka)
+library(mldr)
 ```
 
 \newpage
@@ -478,6 +478,20 @@ pander(MLP.All.correct)
 pander(MLP.b.correct)
 ```
 
+# Weka wrapper and missing items
+
+## Weka wrapper
+after a lot of work, a complete weka wrapper was written in java which can run the trained model via a command line application
+
+## Roc curve
+the first roc curve that was made, was not quite readable
+
+```{r newRoc, echo=FALSE}
+setwd("../data")
+rocData <- read.arff("D:/School/thema 9/Thema9/RickVenemaProject/data/roc_SVM_MLP.arff")
+
+plot(rocData$`True Positives` ~ rocData$`False Positives`, type="l", xlab="False Positives", ylab="True Positives")
+```
 
 
 \begin{thebibliography}{9}
